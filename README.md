@@ -7,6 +7,39 @@ With this in mind, the DM3 team is operating a metrics collection and presentati
 
 We collect metrics using Telegraf, and store them in InfluxDB, a time series database.
 
+### How to setup
+
+Currently, there is automated setup for the service. All changes need to be done on the server or uploaded, and then docker needs a restart. Some useful hints and commands:
+
+#### Restart docker
+
+```
+cd <path to .env and docker-compose.yml>
+docker compose down
+docker compose --env-file .env up -d
+```
+
+#### Update telegraf.conf
+
+Add a delivery service to the list of services we scrape in telegraf.conf by extending this array:
+
+```
+[[inputs.http]]
+  urls = ["https://staging.dm3.network/ds/metrics", "https://testing.dm3.network/ds/metrics"]
+```
+
+Check any changes to the configuration by running:
+
+```
+telegraf --config telegraf.conf --test
+```
+
+If you don't have telegraf installed, you can run this instead:
+
+```
+docker run -it  -v $(pwd)/telegraf.conf:/telegraf.conf:ro telegraf:latest telegraf --config /telegraf.conf --test
+```
+
 ## Data sources
 
 ## Delivery services
