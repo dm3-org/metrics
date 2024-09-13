@@ -13,6 +13,7 @@ services:
         ports:
             - '80:80'
             - '443:443'
+            - '8086:8086'
 
     certbot:
         image: certbot/certbot
@@ -43,7 +44,19 @@ services:
             - influxdb
         environment:
             - INFLUX_TOKEN=${INFLUX_TOKEN}
-            
+
+    grafana:
+        image: grafana/grafana:latest
+        container_name: grafana
+        restart: always
+        depends_on:
+            - influxdb
+        volumes:
+            - grafana-data:/var/lib/grafana
+        # environment:
+        #    - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+        # this did not work, so I set the password in the UI
+
 volumes:
     certbot-etc:
     certbot-var:
@@ -58,5 +71,11 @@ volumes:
         driver_opts:
             type: none
             device: /home/app/statistics/influxdb-data
+            o: bind
+    grafana-data:
+        driver: local
+        driver_opts:
+            type: none
+            device: /home/app/statistics/grafana-data
             o: bind
 
